@@ -1,216 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Bonus Cache Stats</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet"/>
+
+<a id="gc-card" href="https://deimaxlt.github.io/GCBQEXF/" target="_blank"
+  style="cursor:pointer;background:#080f0c;border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:1.8rem 2rem 1.6rem;width:100%;max-width:360px;text-decoration:none;display:block;color:inherit;box-sizing:border-box;transition:border-color .2s,box-shadow .2s,transform .15s;"
+  onmouseover="this.style.borderColor='rgba(74,222,128,.4)';this.style.boxShadow='0 0 32px rgba(74,222,128,.08)';this.style.transform='translateY(-2px)';"
+  onmouseout="this.style.borderColor='rgba(255,255,255,0.09)';this.style.boxShadow='none';this.style.transform='translateY(0)';">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;">
+    <span style="font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4b7a62;">🔒 Bonus Cache Checker</span>
+    <span style="font-size:.8rem;color:#4ade80;opacity:.6;">→</span>
+  </div>
+
+  <div style="display:flex;gap:1rem;margin-bottom:1.3rem;">
+    <div style="flex:1;">
+      <div id="gc-found-num" style="font-family:'Share Tech Mono',monospace;font-size:2.8rem;line-height:1;margin-bottom:.3rem;color:#4ade80;">
+        <span id="gc-shimmer-f" style="display:inline-block;width:2.5rem;height:2.8rem;background:linear-gradient(90deg,#1a2e22 25%,#233d2c 50%,#1a2e22 75%);background-size:200% 100%;border-radius:4px;vertical-align:bottom;"></span>
+      </div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(74,222,128,.55);">✓ Solved</div>
+    </div>
+    <div style="flex:1;">
+      <div id="gc-failed-num" style="font-family:'Share Tech Mono',monospace;font-size:2.8rem;line-height:1;margin-bottom:.3rem;color:#f87171;">
+        <span id="gc-shimmer-d" style="display:inline-block;width:2.5rem;height:2.8rem;background:linear-gradient(90deg,#1a2e22 25%,#233d2c 50%,#1a2e22 75%);background-size:200% 100%;border-radius:4px;vertical-align:bottom;"></span>
+      </div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(248,113,113,.5);">✗ Failed</div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:#2e5540;letter-spacing:.06em;margin-bottom:.4rem;">
+      <span>SUCCESS RATE</span>
+      <span id="gc-rate-label" style="color:#4ade80;">—%</span>
+    </div>
+    <div style="height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;">
+      <div id="gc-bar-fill" style="height:100%;background:linear-gradient(90deg,rgba(74,222,128,.4),#4ade80);border-radius:2px;box-shadow:0 0 8px rgba(74,222,128,.3);width:0%;transition:width .9s cubic-bezier(.4,0,.2,1);"></div>
+    </div>
+  </div>
+
+</a>
+
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: #080f0c;
-    font-family: 'DM Sans', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
-
-  .card {
-    cursor: pointer;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.09);
-    border-radius: 18px;
-    padding: 1.8rem 2rem 1.6rem;
-    width: 100%;
-    max-width: 360px;
-    transition: border-color .2s, box-shadow .2s, transform .15s;
-    text-decoration: none;
-    display: block;
-    color: inherit;
-  }
-
-  .card:hover {
-    border-color: rgba(74,222,128,.4);
-    box-shadow: 0 0 32px rgba(74,222,128,.08);
-    transform: translateY(-2px);
-  }
-
-  .card:active { transform: translateY(0); }
-
-  .top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.4rem;
-  }
-
-  .title {
-    font-size: .72rem;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: #4b7a62;
-  }
-
-  .arrow {
-    font-size: .8rem;
-    color: #4ade80;
-    opacity: .6;
-    transition: opacity .2s, transform .2s;
-  }
-
-  .card:hover .arrow { opacity: 1; transform: translateX(3px); }
-
-  .stats { display: flex; gap: 1rem; margin-bottom: 1.3rem; }
-  .stat  { flex: 1; }
-
-  .num {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 2.8rem;
-    line-height: 1;
-    margin-bottom: .3rem;
-  }
-
-  .found .num { color: #4ade80; }
-  .dnf   .num { color: #f87171; }
-
-  .stat-label {
-    font-size: .68rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-  }
-
-  .found .stat-label { color: rgba(74,222,128,.55); }
-  .dnf   .stat-label { color: rgba(248,113,113,.5); }
-
-  .bar-meta {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: .62rem;
-    color: #2e5540;
-    letter-spacing: .06em;
-    margin-bottom: .4rem;
-  }
-
-  .bar-meta span:last-child { color: #4ade80; }
-
-  .bar-track {
-    height: 4px;
-    background: rgba(255,255,255,.05);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, rgba(74,222,128,.4), #4ade80);
-    border-radius: 2px;
-    box-shadow: 0 0 8px rgba(74,222,128,.3);
-    transition: width .9s cubic-bezier(.4,0,.2,1);
-    width: 0%;
-  }
-
-  /* loading shimmer */
-  .shimmer {
-    display: inline-block;
-    width: 2.5rem; height: 2.8rem;
-    background: linear-gradient(90deg, #1a2e22 25%, #233d2c 50%, #1a2e22 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.2s infinite;
-    border-radius: 4px;
-    vertical-align: bottom;
-  }
-
-  @keyframes shimmer {
+  @keyframes gc-shimmer {
     0%   { background-position: 200% 0 }
     100% { background-position: -200% 0 }
   }
+  #gc-shimmer-f, #gc-shimmer-d {
+    animation: gc-shimmer 1.2s infinite;
+  }
 </style>
-</head>
-<body>
-
-  <!-- REPLACE href with the path/URL to your bonus-cache-checker.html -->
-  <a class="card" href="bonus-cache-checker.html" target="_blank">
-  <!-- END REPLACE -->
-
-    <div class="top">
-      <span class="title">🔒 Bonus Cache Checker</span>
-      <span class="arrow">→</span>
-    </div>
-
-    <div class="stats">
-      <div class="stat found">
-        <div class="num" id="found-num"><span class="shimmer"></span></div>
-        <div class="stat-label">✓ Solved</div>
-      </div>
-      <div class="stat dnf">
-        <div class="num" id="failed-num"><span class="shimmer"></span></div>
-        <div class="stat-label">✗ Failed</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="bar-meta">
-        <span>SUCCESS RATE</span>
-        <span id="rate-label">—%</span>
-      </div>
-      <div class="bar-track">
-        <div class="bar-fill" id="bar-fill"></div>
-      </div>
-    </div>
-
-  </a>
 
 <script>
-// ════════════════════════════════════════════════════════════════
-//  NAMESPACE — must exactly match the one in bonus-cache-checker.html
-// ════════════════════════════════════════════════════════════════
-const NS  = 'my-geocache-series-2025'; // ← REPLACE with your unique name
+(function() {
+  var NS = 'my-geocache-series-2025';
 
-async function loadStats() {
-  try {
-    const [rFound, rFailed] = await Promise.all([
-      fetch(`https://api.counterapi.dev/v1/${NS}/found`).then(r => r.json()),
-      fetch(`https://api.counterapi.dev/v1/${NS}/failed`).then(r => r.json()),
-    ]);
-
-    const found  = rFound.count  || 0;
-    const failed = rFailed.count || 0;
-    const total  = found + failed;
-    const rate   = total > 0 ? Math.round(found / total * 100) : 0;
-
-    animateCount(document.getElementById('found-num'),  found,  900);
-    animateCount(document.getElementById('failed-num'), failed, 900);
-    document.getElementById('rate-label').textContent = rate + '%';
-    document.getElementById('bar-fill').style.width   = rate + '%';
-
-  } catch(e) {
-    document.getElementById('found-num').textContent  = '?';
-    document.getElementById('failed-num').textContent = '?';
-    document.getElementById('rate-label').textContent = '—%';
+  function loadStats() {
+    Promise.all([
+      fetch('https://api.counterapi.dev/v1/' + NS + '/found').then(function(r){ return r.json(); }),
+      fetch('https://api.counterapi.dev/v1/' + NS + '/failed').then(function(r){ return r.json(); })
+    ]).then(function(results) {
+      var found  = results[0].count || 0;
+      var failed = results[1].count || 0;
+      var total  = found + failed;
+      var rate   = total > 0 ? Math.round(found / total * 100) : 0;
+      animateCount(document.getElementById('gc-found-num'), found, 900);
+      animateCount(document.getElementById('gc-failed-num'), failed, 900);
+      document.getElementById('gc-rate-label').textContent = rate + '%';
+      document.getElementById('gc-bar-fill').style.width = rate + '%';
+    }).catch(function() {
+      document.getElementById('gc-found-num').textContent  = '?';
+      document.getElementById('gc-failed-num').textContent = '?';
+      document.getElementById('gc-rate-label').textContent = '—%';
+    });
   }
-}
 
-function animateCount(el, target, ms) {
-  el.innerHTML = ''; // clear shimmer
-  const t0 = performance.now();
-  (function tick(now) {
-    const p = Math.min((now - t0) / ms, 1);
-    const e = 1 - Math.pow(1 - p, 3);
-    el.textContent = Math.round(e * target);
-    if (p < 1) requestAnimationFrame(tick);
-  })(t0);
-}
+  function animateCount(el, target, ms) {
+    el.innerHTML = '';
+    var t0 = performance.now();
+    (function tick(now) {
+      var p = Math.min((now - t0) / ms, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(e * target);
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
 
-loadStats();
-
-// Auto-refresh every 60 seconds so numbers stay live
-setInterval(loadStats, 60_000);
+  loadStats();
+  setInterval(loadStats, 60000);
+})();
 </script>
-</body>
-</html>
