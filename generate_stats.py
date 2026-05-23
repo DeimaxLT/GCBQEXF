@@ -1,17 +1,22 @@
 import json
 import urllib.request
 
-NS = 'my-geocache-series-2025'
+NS = 'gcbqexf'
 
 def fetch(url):
-    with urllib.request.urlopen(url) as r:
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req) as r:
         return json.loads(r.read())
 
-found_data  = fetch(f'https://api.counterapi.dev/v1/{NS}/found')
-failed_data = fetch(f'https://api.counterapi.dev/v1/{NS}/failed')
+try:
+    found_data  = fetch(f'https://api.counterapi.dev/v1/{NS}/found')
+    failed_data = fetch(f'https://api.counterapi.dev/v1/{NS}/failed')
+    found  = found_data.get('count', 0)
+    failed = failed_data.get('count', 0)
+except Exception as e:
+    print(f'Warning: could not fetch stats ({e}), defaulting to 0')
+    found, failed = 0, 0
 
-found  = found_data.get('count', 0)
-failed = failed_data.get('count', 0)
 total  = found + failed
 rate   = round(found / total * 100) if total > 0 else 0
 bar_w  = round(312 * rate / 100)
@@ -25,32 +30,16 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="360" height="160">
       <stop offset="100%" stop-color="#4ade80" stop-opacity="1"/>
     </linearGradient>
   </defs>
-
-  <!-- Background -->
   <rect width="360" height="160" rx="18" fill="#080f0c"/>
   <rect x="0.5" y="0.5" width="359" height="159" rx="18" fill="none" stroke="#ffffff" stroke-opacity="0.09" stroke-width="1"/>
-
-  <!-- Title -->
   <text x="24" y="36" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#4b7a62" letter-spacing="1.5">&#x1F512; BONUS CACHE CHECKER  &#x2192;</text>
-
-  <!-- Found number -->
   <text x="24" y="90" font-family="Courier New, Courier, monospace" font-size="42" font-weight="700" fill="#4ade80">{found}</text>
-
-  <!-- Failed number -->
   <text x="188" y="90" font-family="Courier New, Courier, monospace" font-size="42" font-weight="700" fill="#f87171">{failed}</text>
-
-  <!-- Labels -->
   <text x="24" y="106" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#4ade80" fill-opacity="0.55" letter-spacing="1">&#x2713; SOLVED</text>
   <text x="188" y="106" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#f87171" fill-opacity="0.5" letter-spacing="1">&#x2717; FAILED</text>
-
-  <!-- Bar meta -->
   <text x="24" y="126" font-family="Courier New, Courier, monospace" font-size="9" fill="#2e5540" letter-spacing="0.5">SUCCESS RATE</text>
   <text x="336" y="126" font-family="Courier New, Courier, monospace" font-size="9" fill="#4ade80" text-anchor="end">{rate}%</text>
-
-  <!-- Bar track -->
   <rect x="24" y="132" width="312" height="4" rx="2" fill="#ffffff" fill-opacity="0.05"/>
-
-  <!-- Bar fill -->
   {bar_fill}
 </svg>'''
 
