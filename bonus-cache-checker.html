@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bonus Cache Checker</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:      #080f0c;
+    --card:    rgba(255,255,255,0.04);
+    --border:  rgba(255,255,255,0.09);
+    --green:   #4ade80;
+    --green-d: rgba(74,222,128,0.15);
+    --red:     #f87171;
+    --text:    #d1fae5;
+    --muted:   #4b7a62;
+    --mono:    'Share Tech Mono', monospace;
+    --sans:    'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 4rem;
+  }
+
+  /* faint grid */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(74,222,128,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,222,128,.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+
+  .page { width: 100%; max-width: 460px; position: relative; z-index: 1; }
+
+  /* ── HEADER ── */
+  header { text-align: center; margin-bottom: 2.2rem; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: .65rem;
+    letter-spacing: .14em;
+    color: var(--green);
+    border: 1px solid rgba(74,222,128,.3);
+    border-radius: 99px;
+    padding: .25rem .9rem;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    margin-bottom: .4rem;
+  }
+
+  h1 em { font-style: normal; color: var(--green); }
+
+  .sub {
+    font-size: .85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── INPUTS ── */
+  .fields { display: flex; flex-direction: column; gap: .65rem; margin-bottom: 1.4rem; }
+
+  .field {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    align-items: center;
+    gap: .75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    transition: border-color .2s;
+  }
+
+  .field:focus-within { border-color: rgba(74,222,128,.4); }
+  .field.ok  { border-color: rgba(74,222,128,.6); background: rgba(74,222,128,.05); }
+  .field.err { border-color: rgba(248,113,113,.5); animation: shake .3s ease; }
+
+  .gc-id {
+    font-family: var(--mono);
+    font-size: .7rem;
+    color: var(--green);
+    letter-spacing: .06em;
+  }
+
+  input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: .9rem;
+    width: 100%;
+    letter-spacing: .05em;
+  }
+
+  input::placeholder { color: var(--muted); }
+  .field.ok  input { color: var(--green); }
+  .field.err input { color: var(--red); }
+
+  .tick {
+    display: none;
+    margin-left: auto;
+    color: var(--green);
+    font-size: .85rem;
+  }
+  .field.ok .tick { display: block; }
+
+  /* ── BUTTON ── */
+  .btn {
+    width: 100%;
+    padding: .85rem;
+    background: var(--green-d);
+    border: 1.5px solid rgba(74,222,128,.5);
+    border-radius: 10px;
+    color: var(--green);
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .95rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: .6rem;
+  }
+
+  .btn:hover:not(:disabled) { background: rgba(74,222,128,.22); box-shadow: 0 0 24px rgba(74,222,128,.15); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+
+  .hint-line {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .68rem;
+    color: var(--muted);
+    min-height: 1em;
+    transition: color .2s;
+  }
+  .hint-line.warn { color: #fbbf24; }
+
+  /* ── REWARD ── */
+  #reward {
+    margin-top: 1.8rem;
+    display: none;
+    flex-direction: column;
+    gap: .9rem;
+    animation: rise .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+
+  #reward.show { display: flex; }
+
+  .r-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.3rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .r-label {
+    font-family: var(--mono);
+    font-size: .63rem;
+    letter-spacing: .14em;
+    color: var(--green);
+    margin-bottom: .7rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .r-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(74,222,128,.3), transparent); }
+
+  .coords {
+    font-family: var(--mono);
+    font-size: 1.55rem;
+    color: #fff;
+    letter-spacing: .04em;
+    word-break: break-all;
+  }
+
+  .coords b { color: var(--green); font-weight: 400; }
+
+  .copy-btn {
+    margin-top: .7rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: .68rem;
+    padding: .28rem .7rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .copy-btn:hover { color: var(--green); border-color: rgba(74,222,128,.4); }
+
+  .map-wrap {
+    position: relative;
+    padding-top: 52%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0a1a12;
+    margin-top: .5rem;
+  }
+
+  .map-wrap iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+    filter: invert(.88) hue-rotate(110deg) saturate(.75) brightness(.85);
+  }
+
+  .map-link {
+    display: block;
+    text-align: right;
+    margin-top: .5rem;
+    font-family: var(--mono);
+    font-size: .68rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .map-link:hover { color: var(--green); }
+
+  .hint-box {
+    font-size: .9rem;
+    color: #fef3c7;
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes shake {
+    0%,100%{ transform:translateX(0) }
+    20%    { transform:translateX(-5px) }
+    50%    { transform:translateX(5px) }
+    80%    { transform:translateX(-3px) }
+  }
+
+  @keyframes rise {
+    from { opacity:0; transform:translateY(20px) }
+    to   { opacity:1; transform:translateY(0) }
+  }
+
+  .confetti-p {
+    position: fixed; top: -10px; pointer-events: none; z-index: 9999;
+    animation: fall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(600deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="tag">BONUS CACHE UNLOCK</div>
+    <!-- EDIT: Change the series name below -->
+    <h1>Series <em>Finale</em></h1>
+    <p class="sub">Enter the secret code found at each cache to unlock the bonus.</p>
+  </header>
+
+  <div class="fields" id="fields">
+
+    <!-- ════════════════════════════════════════
+         CACHE INPUTS — edit data-secret on each
+         ════════════════════════════════════════ -->
+
+    <!-- Cache 1: GCBBW8B — REPLACE data-secret -->
+    <div class="field" id="f0">
+      <span class="gc-id">GCBBW8B</span>
+      <input id="i0" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4563"/>
+      <span class="tick">✓</span>
+    </div>
+
+    <!-- Cache 2: GCBC1QM — REPLACE data-secret -->
+    <div class="field" id="f1">
+      <span class="gc-id">GCBC1QM</span>
+      <input id="i1" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="2389"/>
+      <span class="tick">✓</span>
+    </div>
+
+    <!-- Cache 3: GCBDNRD — REPLACE data-secret -->
+    <div class="field" id="f2">
+      <span class="gc-id">GCBDNRD</span>
+      <input id="i2" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="0786"/>
+      <span class="tick">✓</span>
+    </div>
+
+    <!-- Cache 4: GCBC1B3 — REPLACE data-secret -->
+    <div class="field" id="f3">
+      <span class="gc-id">GCBC1B3</span>
+      <input id="i3" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4352"/>
+      <span class="tick">✓</span>
+    </div>
+
+    <!-- Cache 5: GCBBVKQ — REPLACE data-secret -->
+    <div class="field" id="f4">
+      <span class="gc-id">GCBBVKQ</span>
+      <input id="i4" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="1256"/>
+      <span class="tick">✓</span>
+    </div>
+
+    <!-- Cache 6: GCBBZDN — REPLACE data-secret -->
+    <div class="field" id="f5">
+      <span class="gc-id">GCBBZDN</span>
+      <input id="i5" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="9753"/>
+      <span class="tick">✓</span>
+    </div>
+
+  </div><!-- /.fields -->
+
+  <button class="btn" id="btn" disabled>🔒 Unlock Bonus Cache</button>
+  <p class="hint-line" id="hint">Fill all six fields to continue</p>
+
+  <!-- ════════════════════════════════════════════════════════
+       REWARD — revealed only when all codes correct
+       ════════════════════════════════════════════════════════ -->
+  <div id="reward">
+
+    <!-- Coordinates card -->
+    <div class="r-card">
+      <div class="r-label">📍 FINAL COORDINATES</div>
+      <!-- REPLACE the coordinate text below -->
+      <div class="coords"><b>N</b> 55° 42.123 &nbsp;<b>E</b> 021° 08.456</div>
+      <!-- END REPLACE -->
+      <button class="copy-btn" id="copy-btn">📋 Copy</button>
+    </div>
+
+    <!-- Map card -->
+    <div class="r-card">
+      <div class="r-label">🗺 LOCATION PREVIEW</div>
+      <div class="map-wrap">
+        <!-- REPLACE iframe data-src with your Google Maps embed URL -->
+        <iframe id="map-frame"
+          data-src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d5000!2d21.14093!3d55.70205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2slt!4v1"
+          allowfullscreen loading="lazy" title="Bonus location">
+        </iframe>
+        <!-- END REPLACE -->
+      </div>
+      <!-- REPLACE href with your Google Maps share link -->
+      <a class="map-link" href="https://www.google.com/maps?q=55.70205,21.14093" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+      <!-- END REPLACE -->
+    </div>
+
+    <!-- Hint card -->
+    <div class="r-card">
+      <div class="r-label">💡 CACHE HINT</div>
+      <!-- REPLACE hint text below -->
+      <p class="hint-box">Look for a magnetic nano cache beneath the second bench from the east entrance. It blends with the iron railing — check underneath.</p>
+      <!-- END REPLACE -->
+    </div>
+
+  </div><!-- /#reward -->
+
+</div><!-- /.page -->
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  COUNTER API NAMESPACE
+//  Change this to something unique for your cache series.
+//  Use only lowercase letters, numbers, hyphens.
+//  Must match the namespace in cache-stats.html exactly.
+// ════════════════════════════════════════════════════════════════
+const NS = 'gcbqexf'; // ← REPLACE with your own unique name
+
+const hitFound  = () => fetch(`https://api.counterapi.dev/v1/${NS}/found/up`).catch(()=>{});
+const hitFailed = () => fetch(`https://api.counterapi.dev/v1/${NS}/failed/up`).catch(()=>{});
+
+// localStorage key just to remember if THIS device already unlocked
+const CACHE_KEY = 'gc_bonus_v1';
+
+// ── Helpers ────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const inputs = [0,1,2,3,4,5].map(i => $(`i${i}`));
+const cards  = [0,1,2,3,4,5].map(i => $(`f${i}`));
+
+function getSecret(i) { return inputs[i].dataset.secret.trim().toUpperCase(); }
+function getVal(i)    { return inputs[i].value.trim().toUpperCase(); }
+function allFilled()  { return inputs.every(inp => inp.value.trim() !== ''); }
+function allCorrect() { return inputs.every((_, i) => getVal(i) === getSecret(i)); }
+
+// ── Per-field validation on blur ───────────────────────────────
+inputs.forEach((inp, i) => {
+  inp.addEventListener('blur', () => {
+    if (!inp.value.trim()) { cards[i].className = 'field'; return; }
+    cards[i].className = getVal(i) === getSecret(i) ? 'field ok' : 'field err';
+    // re-trigger shake
+    if (cards[i].classList.contains('err')) {
+      cards[i].style.animation = 'none';
+      void cards[i].offsetWidth;
+      cards[i].style.animation = '';
+    }
+    refreshButton();
+  });
+
+  // Live fix: if field is in error state and user types the right thing
+  inp.addEventListener('input', () => {
+    if (cards[i].classList.contains('err') && getVal(i) === getSecret(i)) {
+      cards[i].className = 'field ok';
+    }
+    refreshButton();
+  });
+
+  // Enter → next field
+  inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (i < 5) inputs[i+1].focus();
+    else if (allCorrect()) $('btn').click();
+  });
+});
+
+function refreshButton() {
+  const btn   = $('btn');
+  const hintEl = $('hint');
+  const filled  = allFilled();
+  const correct = allCorrect();
+
+  if (correct) {
+    btn.disabled = false;
+    btn.textContent = '🔓 Unlock Bonus Cache';
+    hintEl.textContent = 'All codes correct — tap unlock!';
+    hintEl.className = 'hint-line warn';
+  } else if (filled) {
+    btn.disabled = true;
+    btn.textContent = '🔒 Unlock Bonus Cache';
+    hintEl.textContent = 'One or more codes are wrong';
+    hintEl.className = 'hint-line warn';
+  } else {
+    btn.disabled = true;
+    btn.textContent = '🔒 Unlock Bonus Cache';
+    hintEl.textContent = 'Fill all six fields to continue';
+    hintEl.className = 'hint-line';
+  }
+}
+
+// ── Unlock ─────────────────────────────────────────────────────
+$('btn').addEventListener('click', () => {
+  if (!allCorrect()) {
+    hitFailed();
+    $('hint').textContent = '⚠ Codes do not match — try again';
+    $('hint').className   = 'hint-line warn';
+    return;
+  }
+  unlock();
+});
+
+function unlock(skipConfetti) {
+  // count a find only once per device
+  try {
+    if (!localStorage.getItem(CACHE_KEY)) hitFound();
+    localStorage.setItem(CACHE_KEY, '1');
+  } catch(e){ hitFound(); }
+
+  $('btn').disabled = true;
+  $('btn').textContent = '✅ Bonus Unlocked';
+  $('hint').textContent = '';
+
+  // lazy-load map
+  const frame = $('map-frame');
+  if (!frame.src) frame.src = frame.dataset.src;
+
+  const reward = $('reward');
+  reward.classList.add('show');
+  setTimeout(() => reward.scrollIntoView({ behavior:'smooth', block:'start' }), 300);
+
+  if (!skipConfetti) confetti();
+}
+
+// ── Copy coords ────────────────────────────────────────────────
+$('copy-btn').addEventListener('click', () => {
+  // REPLACE the string below if you change coordinates
+  navigator.clipboard.writeText('N 55° 42.123  E 021° 08.456')
+    .then(() => {
+      $('copy-btn').textContent = '✅ Copied!';
+      setTimeout(() => { $('copy-btn').textContent = '📋 Copy'; }, 2000);
+    });
+});
+
+// ── Confetti ───────────────────────────────────────────────────
+function confetti() {
+  const colours = ['#4ade80','#fde047','#ffffff','#86efac','#00e5ff'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-p';
+    const size = 5 + Math.random()*7;
+    p.style.cssText = `left:${Math.random()*100}vw;width:${size}px;height:${size}px;
+      background:${colours[Math.random()*colours.length|0]};
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*1.5}s;
+      animation-delay:${Math.random()*.4}s;`;
+    document.body.appendChild(p);
+    p.addEventListener('animationend', () => p.remove());
+  }
+}
+
+// ── Restore on reload ──────────────────────────────────────────
+try {
+  if (localStorage.getItem(CACHE_KEY)) {
+    inputs.forEach((inp, i) => { inp.value = inp.dataset.secret; cards[i].className='field ok'; });
+    refreshButton();
+    unlock(true);
+  }
+} catch(e) {}
+</script>
+</body>
+</html>
