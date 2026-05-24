@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="lt">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Bonus Cache Checker</title>
+<title>Malūno parkas BONUS</title>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
   :root {
@@ -32,7 +32,6 @@
     padding: 2.5rem 1rem 4rem;
   }
 
-  /* faint grid */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -44,6 +43,37 @@
   }
 
   .page { width: 100%; max-width: 460px; position: relative; z-index: 1; }
+
+  /* ── LANGUAGE TOGGLE ── */
+  .lang-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+    gap: 0;
+  }
+
+  .lang-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    padding: .3rem .75rem;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .lang-btn:first-child { border-radius: 6px 0 0 6px; border-right: none; }
+  .lang-btn:last-child  { border-radius: 0 6px 6px 0; }
+
+  .lang-btn.active {
+    background: var(--green-d);
+    border-color: rgba(74,222,128,.5);
+    color: var(--green);
+  }
+
+  .lang-btn:hover:not(.active) { color: var(--text); border-color: rgba(255,255,255,.2); }
 
   /* ── HEADER ── */
   header { text-align: center; margin-bottom: 2.2rem; }
@@ -270,102 +300,86 @@
 <body>
 <div class="page">
 
+  <!-- Language Toggle -->
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lang-lt" onclick="setLang('lt')">LT</button>
+    <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+  </div>
+
   <header>
-    <div class="tag">BONUS CACHE UNLOCK</div>
-    <!-- EDIT: Change the series name below -->
-    <h1>Series <em>Finale</em></h1>
-    <p class="sub">Enter the secret code found at each cache to unlock the bonus.</p>
+<!-- EDIT: Change the series name below -->
+    <h1 id="title-h1">Malūno parko <em>BONUS</em></h1>
+    <p class="sub" data-i18n="sub">Įveskite slaptą kodą, rastą prie kiekvieno kešo, kad atrakintumėte papildomą kešą.</p>
   </header>
 
   <div class="fields" id="fields">
 
-    <!-- ════════════════════════════════════════
-         CACHE INPUTS — edit data-secret on each
-         ════════════════════════════════════════ -->
-
-    <!-- Cache 1: GCBBW8B — REPLACE data-secret -->
+    <!-- Cache 1: GCBBW8B -->
     <div class="field" id="f0">
       <span class="gc-id">GCBBW8B</span>
-      <input id="i0" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4563"/>
+      <input id="i0" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4563" data-i18n-ph="placeholder"/>
       <span class="tick">✓</span>
     </div>
 
-    <!-- Cache 2: GCBC1QM — REPLACE data-secret -->
+    <!-- Cache 2: GCBC1QM -->
     <div class="field" id="f1">
       <span class="gc-id">GCBC1QM</span>
-      <input id="i1" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="2389"/>
+      <input id="i1" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="2389" data-i18n-ph="placeholder"/>
       <span class="tick">✓</span>
     </div>
 
-    <!-- Cache 3: GCBDNRD — REPLACE data-secret -->
+    <!-- Cache 4: GCBC1B3 -->
     <div class="field" id="f2">
-      <span class="gc-id">GCBDNRD</span>
-      <input id="i2" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="0786"/>
-      <span class="tick">✓</span>
-    </div>
-
-    <!-- Cache 4: GCBC1B3 — REPLACE data-secret -->
-    <div class="field" id="f3">
       <span class="gc-id">GCBC1B3</span>
-      <input id="i3" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4352"/>
+      <input id="i2" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="4352" data-i18n-ph="placeholder"/>
       <span class="tick">✓</span>
     </div>
 
-    <!-- Cache 5: GCBBVKQ — REPLACE data-secret -->
-    <div class="field" id="f4">
+    <!-- Cache 5: GCBBVKQ -->
+    <div class="field" id="f3">
       <span class="gc-id">GCBBVKQ</span>
-      <input id="i4" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="1256"/>
+      <input id="i3" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="1256" data-i18n-ph="placeholder"/>
       <span class="tick">✓</span>
     </div>
 
-    <!-- Cache 6: GCBBZDN — REPLACE data-secret -->
-    <div class="field" id="f5">
+    <!-- Cache 6: GCBBZDN -->
+    <div class="field" id="f4">
       <span class="gc-id">GCBBZDN</span>
-      <input id="i5" type="text" placeholder="secret code…" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="9753"/>
+      <input id="i4" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-secret="9753" data-i18n-ph="placeholder"/>
       <span class="tick">✓</span>
     </div>
 
   </div><!-- /.fields -->
 
-  <button class="btn" id="btn" disabled>🔒 Unlock Bonus Cache</button>
-  <p class="hint-line" id="hint">Fill all six fields to continue</p>
+  <button class="btn" id="btn" disabled>🔒 <span data-i18n="btn-locked">Atrakinti papildomą kešą</span></button>
+  <p class="hint-line" id="hint" data-i18n="hint-fill">Užpildykite visus šešis laukus</p>
 
-  <!-- ════════════════════════════════════════════════════════
-       REWARD — revealed only when all codes correct
-       ════════════════════════════════════════════════════════ -->
+  <!-- REWARD -->
   <div id="reward">
 
     <!-- Coordinates card -->
     <div class="r-card">
-      <div class="r-label">📍 FINAL COORDINATES</div>
-      <!-- REPLACE the coordinate text below -->
+      <div class="r-label">📍 <span data-i18n="label-coords">GALUTINĖS KOORDINATĖS</span></div>
       <div class="coords"><b>N</b> 55° 42.123 &nbsp;<b>E</b> 021° 08.456</div>
-      <!-- END REPLACE -->
-      <button class="copy-btn" id="copy-btn">📋 Copy</button>
+      <button class="copy-btn" id="copy-btn">📋 <span data-i18n="copy">Kopijuoti</span></button>
     </div>
 
     <!-- Map card -->
     <div class="r-card">
-      <div class="r-label">🗺 LOCATION PREVIEW</div>
+      <div class="r-label">🗺 <span data-i18n="label-map">VIETOS PERŽIŪRA</span></div>
       <div class="map-wrap">
-        <!-- REPLACE iframe data-src with your Google Maps embed URL -->
         <iframe id="map-frame"
           data-src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d5000!2d21.14093!3d55.70205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2slt!4v1"
           allowfullscreen loading="lazy" title="Bonus location">
         </iframe>
-        <!-- END REPLACE -->
       </div>
-      <!-- REPLACE href with your Google Maps share link -->
-      <a class="map-link" href="https://www.google.com/maps?q=55.70205,21.14093" target="_blank" rel="noopener">Open in Google Maps ↗</a>
-      <!-- END REPLACE -->
+      <a class="map-link" href="https://www.google.com/maps?q=55.70205,21.14093" target="_blank" rel="noopener"><span data-i18n="open-maps">Atidaryti „Google" žemėlapiuose</span> ↗</a>
     </div>
 
     <!-- Hint card -->
     <div class="r-card">
-      <div class="r-label">💡 CACHE HINT</div>
-      <!-- REPLACE hint text below -->
-      <p class="hint-box">Look for a magnetic nano cache beneath the second bench from the east entrance. It blends with the iron railing — check underneath.</p>
-      <!-- END REPLACE -->
+      <div class="r-label">💡 <span data-i18n="label-hint">KEŠO UŽUOMINA</span></div>
+      <p class="hint-box" data-i18n="hint-text">Ieškokite magnetinio nano kešo po antrąja suoliuku nuo rytinio įėjimo. Jis susilieja su geležiniu turėklu — patikrinkite po apačia.</p>
     </div>
 
   </div><!-- /#reward -->
@@ -373,36 +387,114 @@
 </div><!-- /.page -->
 
 <script>
-// ════════════════════════════════════════════════════════════════
-//  COUNTER API NAMESPACE
-//  Change this to something unique for your cache series.
-//  Use only lowercase letters, numbers, hyphens.
-//  Must match the namespace in cache-stats.html exactly.
-// ════════════════════════════════════════════════════════════════
-const NS = 'gcbqexf'; // ← REPLACE with your own unique name
+// ── i18n ────────────────────────────────────────────────────────
+const translations = {
+  lt: {
+    tag:          'PAPILDOMO KEŠO ATRAKINIMAS',
+    sub:          'Įveskite slaptą kodą, rastą prie kiekvieno kešo, kad atrakintumėte papildomą kešą.',
+    placeholder:  'slaptas kodas…',
+    'btn-locked': 'Atrakinti papildomą kešą',
+    'btn-ready':  'Atrakinti papildomą kešą',
+    'btn-done':   '✅ Kešas atrakintas',
+    'hint-fill':  'Užpildykite visus penkis laukus',
+    'hint-ready': 'Visi kodai teisingi — paspauskite atrakinti!',
+    'hint-wrong': 'Vienas ar keli kodai neteisingi',
+    'hint-fail':  '⚠ Kodai nesutampa — bandykite dar kartą',
+    'label-coords':'GALUTINĖS KOORDINATĖS',
+    'label-map':  'VIETOS PERŽIŪRA',
+    'label-hint': 'KEŠO UŽUOMINA',
+    'hint-text':  'Ieškokite magnetinio nano kešo po antrąja suoliuku nuo rytinio įėjimo. Jis susilieja su geležiniu turėklu — patikrinkite po apačia.',
+    copy:         'Kopijuoti',
+    copied:       '✅ Nukopijuota!',
+    'open-maps':  'Atidaryti „Google" žemėlapiuose',
+  },
+  en: {
+    tag:          'BONUS CACHE UNLOCK',
+    sub:          'Enter the secret code found at each cache to unlock the bonus.',
+    placeholder:  'secret code…',
+    'btn-locked': 'Unlock Bonus Cache',
+    'btn-ready':  'Unlock Bonus Cache',
+    'btn-done':   '✅ Bonus Unlocked',
+    'hint-fill':  'Fill all five fields to continue',
+    'hint-ready': 'All codes correct — tap unlock!',
+    'hint-wrong': 'One or more codes are wrong',
+    'hint-fail':  '⚠ Codes do not match — try again',
+    'label-coords':'FINAL COORDINATES',
+    'label-map':  'LOCATION PREVIEW',
+    'label-hint': 'CACHE HINT',
+    'hint-text':  'Look for a magnetic nano cache beneath the second bench from the east entrance. It blends with the iron railing — check underneath.',
+    copy:         'Copy',
+    copied:       '✅ Copied!',
+    'open-maps':  'Open in Google Maps',
+  }
+};
 
+let currentLang = 'lt';
+
+function t(key) { return translations[currentLang][key] || key; }
+
+function applyTranslations() {
+  document.documentElement.lang = currentLang;
+
+  // Update h1 title
+  const titleEl = document.getElementById('title-h1');
+  if (currentLang === 'lt') titleEl.innerHTML = 'Malūno parko <em>BONUS</em>';
+  else                       titleEl.innerHTML = 'Malūno parkas <em>BONUS</em>';
+
+  // Text nodes with data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  // Placeholders
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t('placeholder');
+  });
+
+  // Language toggle buttons
+  document.getElementById('lang-lt').classList.toggle('active', currentLang === 'lt');
+  document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+
+  // Refresh dynamic button/hint state
+  refreshButton();
+
+  // If already unlocked, re-apply button text
+  if ($('btn').textContent.includes('✅') || $('btn').disabled && $('reward').classList.contains('show')) {
+    $('btn').textContent = t('btn-done');
+  }
+
+  // Copy button label (reset to default)
+  const copyBtn = $('copy-btn');
+  if (!copyBtn.textContent.includes('✅')) {
+    copyBtn.innerHTML = '📋 ' + t('copy');
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('gc_lang', lang); } catch(e) {}
+  applyTranslations();
+}
+
+// ── App logic ────────────────────────────────────────────────────
+const NS = 'gcbqexf';
 const hitFound  = () => fetch(`https://api.counterapi.dev/v1/${NS}/found/up`).catch(()=>{});
 const hitFailed = () => fetch(`https://api.counterapi.dev/v1/${NS}/failed/up`).catch(()=>{});
-
-// localStorage key just to remember if THIS device already unlocked
 const CACHE_KEY = 'gc_bonus_v1';
 
-// ── Helpers ────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
-const inputs = [0,1,2,3,4,5].map(i => $(`i${i}`));
-const cards  = [0,1,2,3,4,5].map(i => $(`f${i}`));
+const inputs = [0,1,2,3,4].map(i => $(`i${i}`));
+const cards  = [0,1,2,3,4].map(i => $(`f${i}`));
 
 function getSecret(i) { return inputs[i].dataset.secret.trim().toUpperCase(); }
 function getVal(i)    { return inputs[i].value.trim().toUpperCase(); }
 function allFilled()  { return inputs.every(inp => inp.value.trim() !== ''); }
 function allCorrect() { return inputs.every((_, i) => getVal(i) === getSecret(i)); }
 
-// ── Per-field validation on blur ───────────────────────────────
 inputs.forEach((inp, i) => {
   inp.addEventListener('blur', () => {
     if (!inp.value.trim()) { cards[i].className = 'field'; return; }
     cards[i].className = getVal(i) === getSecret(i) ? 'field ok' : 'field err';
-    // re-trigger shake
     if (cards[i].classList.contains('err')) {
       cards[i].style.animation = 'none';
       void cards[i].offsetWidth;
@@ -411,7 +503,6 @@ inputs.forEach((inp, i) => {
     refreshButton();
   });
 
-  // Live fix: if field is in error state and user types the right thing
   inp.addEventListener('input', () => {
     if (cards[i].classList.contains('err') && getVal(i) === getSecret(i)) {
       cards[i].className = 'field ok';
@@ -419,44 +510,45 @@ inputs.forEach((inp, i) => {
     refreshButton();
   });
 
-  // Enter → next field
   inp.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
-    if (i < 5) inputs[i+1].focus();
+    if (i < 4) inputs[i+1].focus();
     else if (allCorrect()) $('btn').click();
   });
 });
 
 function refreshButton() {
-  const btn   = $('btn');
+  const btn    = $('btn');
   const hintEl = $('hint');
   const filled  = allFilled();
   const correct = allCorrect();
+  const unlocked = $('reward').classList.contains('show');
+
+  if (unlocked) return; // Don't override unlocked state
 
   if (correct) {
     btn.disabled = false;
-    btn.textContent = '🔓 Unlock Bonus Cache';
-    hintEl.textContent = 'All codes correct — tap unlock!';
+    btn.innerHTML = '🔓 ' + t('btn-ready');
+    hintEl.textContent = t('hint-ready');
     hintEl.className = 'hint-line warn';
   } else if (filled) {
     btn.disabled = true;
-    btn.textContent = '🔒 Unlock Bonus Cache';
-    hintEl.textContent = 'One or more codes are wrong';
+    btn.innerHTML = '🔒 ' + t('btn-locked');
+    hintEl.textContent = t('hint-wrong');
     hintEl.className = 'hint-line warn';
   } else {
     btn.disabled = true;
-    btn.textContent = '🔒 Unlock Bonus Cache';
-    hintEl.textContent = 'Fill all six fields to continue';
+    btn.innerHTML = '🔒 ' + t('btn-locked');
+    hintEl.textContent = t('hint-fill');
     hintEl.className = 'hint-line';
   }
 }
 
-// ── Unlock ─────────────────────────────────────────────────────
 $('btn').addEventListener('click', () => {
   if (!allCorrect()) {
     hitFailed();
-    $('hint').textContent = '⚠ Codes do not match — try again';
+    $('hint').textContent = t('hint-fail');
     $('hint').className   = 'hint-line warn';
     return;
   }
@@ -464,17 +556,16 @@ $('btn').addEventListener('click', () => {
 });
 
 function unlock(skipConfetti) {
-  // count a find only once per device
   try {
     if (!localStorage.getItem(CACHE_KEY)) hitFound();
     localStorage.setItem(CACHE_KEY, '1');
   } catch(e){ hitFound(); }
 
-  $('btn').disabled = true;
-  $('btn').textContent = '✅ Bonus Unlocked';
+  const btn = $('btn');
+  btn.disabled = true;
+  btn.textContent = t('btn-done');
   $('hint').textContent = '';
 
-  // lazy-load map
   const frame = $('map-frame');
   if (!frame.src) frame.src = frame.dataset.src;
 
@@ -485,17 +576,14 @@ function unlock(skipConfetti) {
   if (!skipConfetti) confetti();
 }
 
-// ── Copy coords ────────────────────────────────────────────────
 $('copy-btn').addEventListener('click', () => {
-  // REPLACE the string below if you change coordinates
   navigator.clipboard.writeText('N 55° 42.123  E 021° 08.456')
     .then(() => {
-      $('copy-btn').textContent = '✅ Copied!';
-      setTimeout(() => { $('copy-btn').textContent = '📋 Copy'; }, 2000);
+      $('copy-btn').textContent = t('copied');
+      setTimeout(() => { $('copy-btn').innerHTML = '📋 ' + t('copy'); }, 2000);
     });
 });
 
-// ── Confetti ───────────────────────────────────────────────────
 function confetti() {
   const colours = ['#4ade80','#fde047','#ffffff','#86efac','#00e5ff'];
   for (let i = 0; i < 60; i++) {
@@ -512,7 +600,14 @@ function confetti() {
   }
 }
 
-// ── Restore on reload ──────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────
+try {
+  const saved = localStorage.getItem('gc_lang');
+  if (saved === 'en' || saved === 'lt') currentLang = saved;
+} catch(e) {}
+
+applyTranslations();
+
 try {
   if (localStorage.getItem(CACHE_KEY)) {
     inputs.forEach((inp, i) => { inp.value = inp.dataset.secret; cards[i].className='field ok'; });
